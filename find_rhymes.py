@@ -1,5 +1,7 @@
 import nltk
-
+"""
+nltk.download('cmudict')
+"""
 
 def rhyme(inp, level):
     syllables = get_syllables(inp)
