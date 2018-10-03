@@ -41,4 +41,15 @@ def find_rhymes(word1, word2):
     return w1, w2, pd.merge(w1, w2, on='syl')
 
 
-find_rhymes('pretty', 'girl')
+w1, w2, m = find_rhymes('peach', 'elbow')
+
+joint_syl = list(set(w1.syl.unique()).intersection(set(w2.syl.unique())))
+for syl in joint_syl:
+    print syl, ':'
+    print w1[w1.syl == syl].word.values
+    print w2[w2.syl == syl].word.values
+
+def print_tripplet(g):
+    print g.name
+    print '\t'+g['word_x'].unique()
+    print '\t'+g['word_y'].unique()
