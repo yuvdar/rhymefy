@@ -15,7 +15,7 @@ def rhyme(inp, level):
 
 def get_syllables(inp):
     entries = nltk.corpus.cmudict.entries()
-    syllables = [(word, syl) for word, syl in entries if word == inp]
+    syllables = [syl for word, syl in entries if word == inp]
     return syllables
 
 
