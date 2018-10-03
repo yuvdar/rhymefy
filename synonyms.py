@@ -27,10 +27,10 @@ def syns(word_list):
         word_list = [word_list]
     all_syns = []
     for word in word_list:
-        all_syns.extend([a['text'].encode('utf-8').strip() for a in d.decode(vb.synonym(word))])
+        all_syns.extend([a['text'] for a in d.decode(vb.synonym(word))])
     return list(set(all_syns))
 words1 = syns(syns('chance'))
-words2 = syns(syns('hand'))
+words2 = syns('hand')
 
 l1 = [last_syllables(w) for w in words1]
 l2 = [last_syllables(w) for w in words2]
