@@ -1,0 +1,12 @@
+nltk
+textblob
+corenlp
+spacy
+gensim
+tensorflow
+keras
+sklearn
+statsmodels
+scrapy
+vocubulary
+ipython
