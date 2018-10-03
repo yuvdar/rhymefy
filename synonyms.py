@@ -1,25 +1,19 @@
 from vocabulary.vocabulary import Vocabulary as vb
-import json
 import pandas as pd
-
-d = json.decoder.JSONDecoder()
+import re
 
 
 def last_syllables(word):
-    pron = vb.pronunciation(word)
+    pron = vb.pronunciation(re.sub('[^A-Za-z0-9]+', '', word), format='dict')
     if pron is False:
-        return None
-    else:
-        return ''.join(d.decode(pron)[-1]['raw'].split(' ')[-2:])
-
-
-def rhymes(w1, w2):
-    l1 = last_syllables(w1)
-    l2 = last_syllables(w2)
-    if l1 is not None and l2 is not None and l1 == l2:
-        return True
-    else:
         return False
+    else:
+        d = pd.DataFrame(pron.values())
+        if 'arpabet' in d['rawType'].values:
+            pr = d[d['rawType'] == 'arpabet'].iloc[0]['raw']
+            return ''.join(pr.split(' ')[-2:])
+        else:
+            return False
 
 
 def syns(word_list):
@@ -27,19 +21,27 @@ def syns(word_list):
         word_list = [word_list]
     all_syns = []
     for word in word_list:
-        all_syns.extend([a['text'] for a in d.decode(vb.synonym(word))])
+        syns = vb.synonym(re.sub('[^A-Za-z0-9]+', '', word), format='dict')
+        if syns:
+            all_syns.extend(syns.values())
+    all_syns.extend(word_list)
     return list(set(all_syns))
-words1 = syns(syns('chance'))
-words2 = syns('hand')
 
-l1 = [last_syllables(w) for w in words1]
-l2 = [last_syllables(w) for w in words2]
 
-w1 = pd.DataFrame({'word': words1, 'syl': l1})
-w1 = w1[w1.syl != False]
+def find_rhymes(word1, word2):
+    words1 = syns(syns(word1))
+    words2 = syns(syns(word2))
 
-w2 = pd.DataFrame({'word': words2, 'syl': l2})
-w2 = w2[w2.syl != False]
+    l1 = [last_syllables(w) for w in words1]
+    l2 = [last_syllables(w) for w in words2]
 
-pd.merge(w1, w2, on='syl')
+    w1 = pd.DataFrame({'word': words1, 'syl': l1})
+    w1 = w1[w1.syl != False]
 
+    w2 = pd.DataFrame({'word': words2, 'syl': l2})
+    w2 = w2[w2.syl != False]
+
+    pd.merge(w1, w2, on='syl')
+
+
+find_rhymes('pretty', 'woman')
