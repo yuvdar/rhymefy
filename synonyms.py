@@ -1,19 +1,16 @@
 from vocabulary.vocabulary import Vocabulary as vb
 import pandas as pd
 import re
+from thesaurus import Word
+import pronouncing as pr
 
 
 def last_syllables(word):
-    pron = vb.pronunciation(re.sub('[^A-Za-z0-9]+', '', word), format='dict')
-    if pron is False:
-        return False
+    phones = pr.phones_for_word(word)
+    if phones:
+        return ''.join(phones[0].split(' ')[-2:])
     else:
-        d = pd.DataFrame(pron.values())
-        if 'arpabet' in d['rawType'].values:
-            pr = d[d['rawType'] == 'arpabet'].iloc[0]['raw']
-            return ''.join(pr.split(' ')[-2:])
-        else:
-            return False
+        return False
 
 
 def syns(word_list):
@@ -21,9 +18,9 @@ def syns(word_list):
         word_list = [word_list]
     all_syns = []
     for word in word_list:
-        syns = vb.synonym(re.sub('[^A-Za-z0-9]+', '', word), format='dict')
+        syns = Word(word).synonyms()
         if syns:
-            all_syns.extend(syns.values())
+            all_syns.extend(syns)
     all_syns.extend(word_list)
     return list(set(all_syns))
 
@@ -41,7 +38,7 @@ def find_rhymes(word1, word2):
     w2 = pd.DataFrame({'word': words2, 'syl': l2})
     w2 = w2[w2.syl != False]
 
-    pd.merge(w1, w2, on='syl')
+    return w1, w2, pd.merge(w1, w2, on='syl')
 
 
-find_rhymes('pretty', 'woman')
+find_rhymes('pretty', 'girl')
