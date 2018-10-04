@@ -16,6 +16,6 @@ def rhyme_zone(word1, word2):
 
 
 def rhyme_zone_sort(word1, word2):
-    return list(reversed(sorted([(word, MODEL.similarity(word1, word)) for word in get_rhyme(word2) if word in MODEL],key=lambda
-        x: x[1])))
+    un_sort = [(word, MODEL.similarity(word1, word)) for word in get_rhyme(word2) if word in MODEL]
+    return list(reversed(sorted(un_sort,key=lambda x: x[1])))
 
