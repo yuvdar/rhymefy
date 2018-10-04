@@ -68,6 +68,8 @@ def get_original(file_name):
 def main():
     data = get_translated('heb_from_csv_s0_e50_en.txt')
     data2 = get_original('songs_700.txt')
+    all_data = data.append(data2, ignore_index=True)
+    all_data.to_hdf('songs_sample.h5', 'sample')
 
 if __name__=='__main__':
     main()
