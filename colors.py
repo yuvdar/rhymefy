@@ -15,7 +15,7 @@ def colors(n):
         r = int(r) % 256
         g = int(g) % 256
         b = int(b) % 256
-        ret.append(colorsys.rgb_to_hsv(r, g, b))
+        ret.append((r, g, b))
     return ret
 
 
