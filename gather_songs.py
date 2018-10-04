@@ -108,9 +108,11 @@ def main():
         all_data['v' + str(i)] = all_data['t' + str(i)].apply(lambda x: get_average_word2vec(x, word2vec))
 
     cnn_data = []
+    labels = all_data['translated']
     for _, row in all_data.iterrows():
         row_data = np.vstack([row['v%d'%i] for i in range(k)])
         cnn_data.append(row_data)
+
 
 
 if __name__=='__main__':
