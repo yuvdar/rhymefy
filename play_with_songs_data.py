@@ -40,15 +40,15 @@ def write_to_file(songs, n=10, is_random=False):
         songs1 = songs.head(n).copy()
     songs1['text_lines'] = songs1['text'].str.split('\n')
 
-    songs1['first_byte_lines'] = songs1['text_lines'].apply(lambda txt_lines: txt_lines[:[len(t.strip()) for t in txt_lines].index(0)])
-    songs1['first_byte'] = songs1['first_byte_lines'].apply(lambda l: "\n".join(l))
+    # songs1['first_byte_lines'] = songs1['text_lines'].apply(lambda txt_lines: txt_lines[:[len(t.strip()) for t in txt_lines].index(0)])
+    # songs1['first_byte'] = songs1['first_byte_lines'].apply(lambda l: "\n".join(l))
 
-    songs1['byte_with_suf'] = songs1['song'] + '\n' \
+    songs1['song_with_suf'] = songs1['song'] + '\n' \
                               + songs1['artist'] + '\n----------------\n' \
-                              + songs1['first_byte']+'\nthis is the end of the byte\n\n'
+                              + songs1['text']+'\nthis is the end of the song\n\n'
 
-    fh = open('bytes_%d.txt' %(n), 'w')
-    fh.writelines(songs1['byte_with_suf'].astype('str').values)
+    fh = open('songs_%d.txt' %(n), 'w')
+    fh.writelines(songs1['song_with_suf'].astype('str').values)
     fh.close()
 
 
