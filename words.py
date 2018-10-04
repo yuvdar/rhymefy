@@ -12,4 +12,10 @@ def get_similar(word, n=10):
 
 
 def rhyme_zone(word1, word2):
-    MODEL.most_similar_to_given(word1,[w for w in get_rhyme(word2) if w in MODEL])
+    return MODEL.most_similar_to_given(word1,[w for w in get_rhyme(word2) if w in MODEL])
+
+
+def rhyme_zone_sort(word1, word2):
+    return list(reversed(sorted([(word, MODEL.similarity(word1, word)) for word in get_rhyme(word2) if word in MODEL],key=lambda
+        x: x[1])))
+
