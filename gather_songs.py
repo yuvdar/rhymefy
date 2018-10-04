@@ -47,6 +47,7 @@ def expand_data(data, word2vec, number_of_lines=6):
         standardize_text(data, i)
         data['t' + str(i)] = data[i].apply(tokenizer.tokenize)
         data['v' + str(i)] = data['t' + str(i)].apply(lambda x: get_average_word2vec(x, word2vec))
+        data['p' + str(i)] = data['t' + str(i)].apply(lambda x: phones.last_phone(x[-1]))
     return data
 
 def filter_song(song):
