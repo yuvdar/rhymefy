@@ -33,8 +33,27 @@ def count_words(songs, n=1000):
     return num_words
 
 
+def write_to_file(songs, n=10, is_random=False):
+    if is_random:
+        songs1 = songs.sample(n).copy()
+    else:
+        songs1 = songs.head(n).copy()
+    songs1['text_with_suf'] = songs1['song'] + '\n' \
+                              + songs1['artist'] + '\n----------------\n' \
+                              + songs1['text']+'\nthis is the end of the song\n\n'
+    fh = open('try_song_%d.txt' %(n), 'w')
+    fh.writelines(songs1['text_with_suf'].astype('str').values)
+    fh.close()
+
+
+
+
 if __name__ == '__main__':
     songs = pd.read_csv('songdata.csv')
+    write_to_file(songs, n=20, is_random=True)
 
     print count_words(songs, n=1000)
     print get_pairs_hist(songs, n=2000)
+
+    # yuval file:
+    d = pd.read_excel('/home/igor/Downloads/1001dataset.xlsm')
