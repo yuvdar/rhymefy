@@ -41,6 +41,14 @@ def get_translated(file_name, k=6):
     return data
 
 
+def expand_data(data, word2vec, number_of_lines=6):
+    tokenizer = RegexpTokenizer(r'\w+')
+    for i in range(number_of_lines):
+        standardize_text(data, i)
+        data['t' + str(i)] = data[i].apply(tokenizer.tokenize)
+        data['v' + str(i)] = data['t' + str(i)].apply(lambda x: get_average_word2vec(x, word2vec))
+    return data
+
 def filter_song(song):
     for i in range(len(song)):
         if song[i].find('this is the end of the song') != -1:
