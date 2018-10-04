@@ -14,7 +14,7 @@ def standardize_text(df, text_field):
     return df
 
 
-def get_translated(file_name):
+def get_translated(file_name, k=6):
     lines = open(file_name).readlines()
     lines = [l for l in lines if len(l)>2]
 
@@ -29,7 +29,6 @@ def get_translated(file_name):
             current_song = []
 
     # Take only the last k lines
-    k = 6
     songs = [song for song in songs if len(song) >= k]
 
     agg_lines = []
@@ -49,7 +48,7 @@ def filter_song(song):
     return []
 
 
-def get_original(file_name):
+def get_original(file_name, k=6):
     lines = open(file_name).readlines()
     lines = [l for l in lines if len(l.strip())>2]
 
@@ -64,7 +63,6 @@ def get_original(file_name):
             current_song = []
 
     # Take only the last k lines
-    k = 6
     songs = [filter_song(song) for song in songs]
     songs = [song for song in songs if len(song) >= k]
 
@@ -92,16 +90,17 @@ def get_average_word2vec(tokens_list, vector, generate_missing=False, k=300):
 
 
 def main():
-    k = 6
-    data = get_translated('heb_from_csv_s0_e50_en.txt', k=k)
-    data2 = get_original('songs_700.txt', k=k)
-    all_data = data.append(data2, ignore_index=True)
-    all_data.to_hdf('songs_sample.h5', 'sample')
-    tokenizer = RegexpTokenizer(r'\w+')
-
     # Run once:
     word2vec_path = "models/GoogleNews-vectors-negative300.bin"
     word2vec = gensim.models.KeyedVectors.load_word2vec_format(word2vec_path, binary=True)
+
+    k = 6
+    data = get_translated('heb_from_csv_s0_e50_en.txt', k=k)
+    data2 = get_original('songs_700.txt', k=k)
+    all_data = data.append(data2[:50], ignore_index=True)
+    all_data.to_hdf('songs_sample.h5', 'sample')
+    tokenizer = RegexpTokenizer(r'\w+')
+
     for i in range(k):
         standardize_text(all_data, i)
         all_data['t' + str(i)] = all_data[i].apply(tokenizer.tokenize)
@@ -113,7 +112,21 @@ def main():
         row_data = np.vstack([row['v%d'%i] for i in range(k)])
         cnn_data.append(row_data)
 
+    from sklearn import svm
+    cnn_data = np.array(cnn_data)
+    from sklearn.model_selection import train_test_split
+    from sklearn.metrics import precision_score
 
+    X = []
+    for i in range(len(cnn_data)):
+        X.append(np.reshape(cnn_data[i], (-1,)))
+    X = np.array(X)
+    Y = labels.astype(int).values
+    clf = svm.SVC(gamma='scale', C=1000)
+    X_train, X_test, Y_train, Y_test = train_test_split(X, Y, test_size=0.33, random_state=42)
+    clf.fit(X_train, Y_train)
+    obs = clf.predict(X_test)
+    precision_score(Y_test, obs)
 
 if __name__=='__main__':
     main()
