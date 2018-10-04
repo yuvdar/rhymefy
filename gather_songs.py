@@ -48,7 +48,7 @@ def expand_data(data, word2vec, number_of_lines=6):
         standardize_text(data, i)
         data['t' + str(i)] = data[i].apply(tokenizer.tokenize)
         data['v' + str(i)] = data['t' + str(i)].apply(lambda x: get_average_word2vec(x, word2vec))
-
+    return data
 
 def filter_song(song):
     for i in range(len(song)):
