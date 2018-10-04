@@ -38,11 +38,17 @@ def write_to_file(songs, n=10, is_random=False):
         songs1 = songs.sample(n).copy()
     else:
         songs1 = songs.head(n).copy()
-    songs1['text_with_suf'] = songs1['song'] + '\n' \
+    songs1['text_lines'] = songs1['text'].str.split('\n')
+
+    songs1['first_byte_lines'] = songs1['text_lines'].apply(lambda txt_lines: txt_lines[:[len(t.strip()) for t in txt_lines].index(0)])
+    songs1['first_byte'] = songs1['first_byte_lines'].apply(lambda l: "\n".join(l))
+
+    songs1['byte_with_suf'] = songs1['song'] + '\n' \
                               + songs1['artist'] + '\n----------------\n' \
-                              + songs1['text']+'\nthis is the end of the song\n\n'
-    fh = open('try_song_%d.txt' %(n), 'w')
-    fh.writelines(songs1['text_with_suf'].astype('str').values)
+                              + songs1['first_byte']+'\nthis is the end of the byte\n\n'
+
+    fh = open('bytes_%d.txt' %(n), 'w')
+    fh.writelines(songs1['byte_with_suf'].astype('str').values)
     fh.close()
 
 
@@ -57,3 +63,19 @@ if __name__ == '__main__':
 
     # yuval file:
     d = pd.read_excel('/home/igor/Downloads/1001dataset.xlsm')
+    lyrs = pd.read_excel('/home/igor/Downloads/1001dataset.xlsm',sheet_name='lyrics')
+    lyr_cols = [col for col in lyrs.columns if col.startswith('LYRICS')]
+
+    i_min=51
+    i_max=100
+    fh = open('heb_from_csv_s%d_e%d.txt' %(i_min, i_max), 'w')
+    for i, lyr in lyrs.iterrows():
+        if i<i_min or i>i_max:
+            continue
+        try:
+            fh.write(u'\n'.join(lyr[lyr_cols].dropna().values).encode('utf8').strip())
+            fh.write('\n%d ------------------------- %d\n' %(i, i))
+        except:
+            print 'bassa', i
+
+    fh.close()
