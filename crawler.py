@@ -1,7 +1,6 @@
 import requests
 from lxml import html
 
-
 WEB_RHYME = 'https://www.rhymezone.com/r/rhyme.cgi?Word={}&typeofrhyme=perfect'
 
 
@@ -23,4 +22,5 @@ def get_rhyme(word):
 
     return lst_s
 
-print get_rhyme('Working')
+#print get_rhyme('Working')
+
