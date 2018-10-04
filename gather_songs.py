@@ -2,7 +2,7 @@ import pandas as pd
 from nltk.tokenize import RegexpTokenizer
 import numpy as np
 import gensim
-
+import phones
 
 def standardize_text(df, text_field):
     df[text_field] = df[text_field].str.replace(r"http\S+", "")
@@ -113,6 +113,7 @@ def main():
         standardize_text(all_data, i)
         all_data['t' + str(i)] = all_data[i].apply(tokenizer.tokenize)
         all_data['v' + str(i)] = all_data['t' + str(i)].apply(lambda x: get_average_word2vec(x, word2vec))
+        all_data['p' + str(i)] = all_data['t' + str(i)].apply(lambda x: phones.last_phone(x[-1]))
 
     cnn_data = []
     labels = all_data['translated']
