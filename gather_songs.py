@@ -3,6 +3,7 @@ from nltk.tokenize import RegexpTokenizer
 import numpy as np
 import gensim
 
+
 def standardize_text(df, text_field):
     df[text_field] = df[text_field].str.replace(r"http\S+", "")
     df[text_field] = df[text_field].str.replace(r"http", "")
@@ -91,18 +92,25 @@ def get_average_word2vec(tokens_list, vector, generate_missing=False, k=300):
 
 
 def main():
-    data = get_translated('heb_from_csv_s0_e50_en.txt')
-    data2 = get_original('songs_700.txt')
+    k = 6
+    data = get_translated('heb_from_csv_s0_e50_en.txt', k=k)
+    data2 = get_original('songs_700.txt', k=k)
     all_data = data.append(data2, ignore_index=True)
     all_data.to_hdf('songs_sample.h5', 'sample')
-    k = 6
     tokenizer = RegexpTokenizer(r'\w+')
+
+    # Run once:
     word2vec_path = "models/GoogleNews-vectors-negative300.bin"
     word2vec = gensim.models.KeyedVectors.load_word2vec_format(word2vec_path, binary=True)
     for i in range(k):
         standardize_text(all_data, i)
         all_data['t' + str(i)] = all_data[i].apply(tokenizer.tokenize)
         all_data['v' + str(i)] = all_data['t' + str(i)].apply(lambda x: get_average_word2vec(x, word2vec))
+
+    cnn_data = []
+    for _, row in all_data.iterrows():
+        row_data = np.vstack([row['v%d'%i] for i in range(k)])
+        cnn_data.append(row_data)
 
 
 if __name__=='__main__':
